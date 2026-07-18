@@ -11,7 +11,8 @@
     /* ================================================================ *
      * Memento Mori — pagina una, sine ope externa (HTML/CSS/JS purus).
      * Forma verticalis telephono apta: anni in axe verticali, menses
-     * in horizontali. Omnia in schermo, sine volumine (nulla scroll).
+     * (Ianuarius..December) in horizontali. Tabula compacta, in medio
+     * schermi collocata, sine volumine (nulla scroll).
      * ================================================================ */
 
     :root {
@@ -20,8 +21,9 @@
       --ring:  #b9b7b2;
       --muted: #666;
       --error: #b23a3a;
-      --dot:   6px;               /* a JavaScript pro spatio recomputatur */
-      --gutter: 2.1em;
+      --cell:  12px;              /* a JavaScript pro spatio recomputatur */
+      --dot:   9px;               /* idem */
+      --gutter: 1.7em;
       font-size: clamp(11px, 3.4vw, 15px);
     }
 
@@ -59,8 +61,8 @@
       width: 100%;
       max-width: 460px;
       height: 100dvh;
-      padding: calc(env(safe-area-inset-top) + 1.1rem) .9rem
-               calc(env(safe-area-inset-bottom) + .8rem);
+      padding: calc(env(safe-area-inset-top) + 1rem) .9rem
+               calc(env(safe-area-inset-bottom) + .7rem);
       display: flex;
       flex-direction: column;
     }
@@ -68,60 +70,53 @@
     .head .title { font-size: 1.9rem; }
     .head .subtitle { font-size: .98rem; margin-top: .5rem; }
 
-    /* ----- tabula punctorum ----- */
+    /* ----- area tabulae: in medio verticaliter et horizontaliter ----- */
     .chart {
       flex: 1 1 auto;
       min-height: 0;
       display: flex;
       flex-direction: column;
-      margin-top: 1.05rem;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
     }
 
-    .axis-top { display: flex; align-items: flex-end; }
-    .corner { flex: 0 0 var(--gutter); width: var(--gutter); text-align: center; }
+    /* una tabula (grid) tenet titulos et puncta ut recte congruant */
+    .matrix {
+      display: grid;
+      grid-template-columns: var(--gutter) repeat(12, var(--cell));
+      grid-template-rows: auto repeat(80, var(--cell));
+      align-items: center;
+      justify-items: center;
+    }
+
+    .corner { position: relative; }
     .corner small {
-      display: block;
+      position: absolute;
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      padding-right: .5em;
       font-size: .5rem;
       letter-spacing: .12em;
       color: var(--muted);
-      transform: translateY(-2px);
     }
-    .months {
-      flex: 1 1 auto;
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      text-align: center;
-      font-size: .58rem;
-      color: #555;
-      padding-bottom: .28rem;
-    }
-
-    .axis-main { flex: 1 1 auto; min-height: 0; display: flex; }
-    .years {
-      flex: 0 0 var(--gutter);
-      width: var(--gutter);
-      display: grid;
-      grid-template-rows: repeat(80, 1fr);
-      font-size: .56rem;
-      color: #555;
-    }
-    .years b {
-      grid-column: 1;
-      align-self: center;
+    .mlabel { font-size: .56rem; color: #555; }
+    .ylabel {
       justify-self: end;
-      padding-right: .35rem;
-      font-weight: 400;
+      padding-right: .5em;
+      font-size: .54rem;
+      color: #555;
     }
 
-    .grid-wrap { flex: 1 1 auto; min-width: 0; }
-    .dots {
+    .cell {
       width: 100%;
       height: 100%;
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-template-rows: repeat(80, 1fr);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .cell { display: flex; align-items: center; justify-content: center; }
     .cell i {
       width: var(--dot);
       height: var(--dot);
@@ -142,7 +137,6 @@
       align-items: center;
       justify-content: center;
       gap: .6rem;
-      margin-top: .55rem;
       padding-left: .28em;
       font-size: .66rem;
       letter-spacing: .28em;
@@ -151,7 +145,7 @@
     .axis-caption .arrow { color: #888; font-size: .8rem; }
 
     /* ----- sententia ----- */
-    .quote { text-align: center; margin-top: .7rem; }
+    .quote { text-align: center; margin-top: .6rem; }
     .quote .mark { display: block; font-size: 1.4rem; line-height: .4; }
     .quote p {
       margin-top: .35rem;
@@ -162,7 +156,7 @@
     }
     .quote .author {
       display: block;
-      margin-top: .6rem;
+      margin-top: .55rem;
       font-size: .62rem;
       letter-spacing: .34em;
       padding-left: .34em;
@@ -221,7 +215,7 @@
       justify-content: center;
       gap: .3rem;
       width: 100%;
-      font-size: clamp(1.35rem, 6.8vw, 2rem);   /* pyxides scalat */
+      font-size: clamp(1.35rem, 6.8vw, 2rem);
     }
     .field {
       display: flex;
@@ -293,20 +287,9 @@
       <p class="subtitle">Vivamus, quia moriendum est.</p>
     </header>
 
-    <section class="chart">
-      <div class="axis-top">
-        <div class="corner"><small>MENSES</small></div>
-        <div class="months" id="months" aria-hidden="true"></div>
-      </div>
-
-      <div class="axis-main">
-        <div class="years" id="years" aria-hidden="true"></div>
-        <div class="grid-wrap">
-          <div class="dots" id="dots" role="img" aria-label="Menses vitae per octoginta annos acti"></div>
-        </div>
-      </div>
-
-      <p class="axis-caption">
+    <section class="chart" id="chart">
+      <div class="matrix" id="matrix" role="img" aria-label="Menses vitae per octoginta annos"></div>
+      <p class="axis-caption" id="caption">
         <span class="arrow">&larr;</span> ANNI (1&ndash;80) <span class="arrow">&rarr;</span>
       </p>
     </section>
@@ -354,104 +337,131 @@
   /* ================================================================== *
    * Ratio applicationis.
    *
-   * Quodque punctum unus mensis vitae octoginta annorum est
-   * (80 × 12 = 960 menses). Ordines sunt anni (axis verticalis),
-   * columnae menses (axis horizontalis). Menses iam acti implentur ex
-   * die natali, qui in localStorage servatur.
+   * Ordines sunt anni vitae (axis verticalis, 1..80), columnae menses
+   * kalendarii (Ianuarius=1 .. December=12, axis horizontalis). Quisque
+   * ordo unum annum kalendarii repraesentat, ab anno nativitatis. Menses
+   * a die natali usque ad mensem currentem implentur; mensis currens
+   * signatur. Dies natalis in localStorage servatur.
    * ================================================================== */
   (function () {
     "use strict";
 
     var YEARS = 80;
     var MONTHS = 12;
-    var TOTAL = YEARS * MONTHS;
     var STORAGE_KEY = "mementoMori.birth";
+    var DOT_RATIO = 0.8;           /* magnitudo puncti intra cellulam */
+    var root = document.documentElement;
 
     var el = {
-      months: document.getElementById("months"),
-      years:  document.getElementById("years"),
-      dots:   document.getElementById("dots"),
-      intro:  document.getElementById("intro"),
-      form:   document.getElementById("form"),
-      day:    document.getElementById("day"),
-      month:  document.getElementById("month"),
-      year:   document.getElementById("year"),
-      error:  document.getElementById("error"),
-      reset:  document.getElementById("reset")
+      matrix:  document.getElementById("matrix"),
+      chart:   document.getElementById("chart"),
+      caption: document.getElementById("caption"),
+      intro:   document.getElementById("intro"),
+      form:    document.getElementById("form"),
+      day:     document.getElementById("day"),
+      month:   document.getElementById("month"),
+      year:    document.getElementById("year"),
+      error:   document.getElementById("error"),
+      reset:   document.getElementById("reset")
     };
 
-    var cells = [];
+    var cells = [];                /* cells[(annus-1)*12 + (mensis-1)] */
+    var birthISO = null;
 
     /* ----- tabulam semel aedificare ----- */
     function build() {
-      var frag, i;
+      var frag = document.createDocumentFragment();
+      var i, j, node;
 
-      // tituli mensium (1..12) supra axem horizontalem
-      frag = document.createDocumentFragment();
+      // angulus cum titulo "MENSES"
+      node = document.createElement("div");
+      node.className = "corner";
+      node.style.gridArea = "1 / 1";
+      var small = document.createElement("small");
+      small.textContent = "MENSES";
+      node.appendChild(small);
+      frag.appendChild(node);
+
+      // tituli mensium (1..12) in prima linea
       for (i = 1; i <= MONTHS; i++) {
-        var span = document.createElement("span");
-        span.textContent = i;
-        frag.appendChild(span);
+        node = document.createElement("div");
+        node.className = "mlabel";
+        node.style.gridArea = "1 / " + (i + 1);
+        node.textContent = i;
+        frag.appendChild(node);
       }
-      el.months.appendChild(frag);
 
-      // tituli annorum (per decades) ad axem verticalem
-      frag = document.createDocumentFragment();
+      // tituli annorum (per decades) in prima columna
+      for (i = 10; i <= YEARS; i += 10) {
+        node = document.createElement("div");
+        node.className = "ylabel";
+        node.style.gridArea = (i + 1) + " / 1";
+        node.textContent = i;
+        frag.appendChild(node);
+      }
+
+      // puncta: ordo = annus, columna = mensis
       for (i = 1; i <= YEARS; i++) {
-        var b = document.createElement("b");
-        b.style.gridRow = i;
-        b.textContent = (i % 10 === 0) ? i : "";
-        frag.appendChild(b);
+        for (j = 1; j <= MONTHS; j++) {
+          node = document.createElement("div");
+          node.className = "cell";
+          node.style.gridArea = (i + 1) + " / " + (j + 1);
+          node.appendChild(document.createElement("i"));
+          cells.push(node);
+          frag.appendChild(node);
+        }
       }
-      el.years.appendChild(frag);
 
-      // puncta: ordo = annus (desuper deorsum), columna = mensis
-      frag = document.createDocumentFragment();
-      for (i = 0; i < TOTAL; i++) {
-        var cell = document.createElement("div");
-        cell.className = "cell";
-        cell.appendChild(document.createElement("i"));
-        frag.appendChild(cell);
-        cells.push(cell);
-      }
-      el.dots.appendChild(frag);
+      el.matrix.appendChild(frag);
     }
 
-    /* ----- puncta rotunda et intra cellulam servare ----- */
-    function sizeDots() {
-      var w = el.dots.clientWidth;
-      var h = el.dots.clientHeight;
-      if (!w || !h) return;
-      var d = Math.max(3, Math.floor(Math.min(w / MONTHS, h / YEARS) * 0.66));
-      document.documentElement.style.setProperty("--dot", d + "px");
+    /* ----- magnitudinem cellulae et puncti pro spatio computare ----- */
+    function layout() {
+      var availW = el.chart.clientWidth;
+      var availH = el.chart.clientHeight - el.caption.offsetHeight;
+      if (availW <= 0 || availH <= 0) return;
+
+      var gutterPx = 30;           // columna titulorum annorum + spatium
+      var labelRowPx = 16;         // linea titulorum mensium
+      var margin = 8;              // parvum spatium ne quid excedat
+
+      var cellW = (availW - gutterPx) / MONTHS;
+      var cellH = (availH - labelRowPx - margin) / YEARS;
+      var cell = Math.max(5, Math.floor(Math.min(cellW, cellH)));
+
+      root.style.setProperty("--cell", cell + "px");
+      root.style.setProperty("--dot", Math.max(4, Math.round(cell * DOT_RATIO)) + "px");
     }
 
-    /* ----- menses pleni ex die natali acti ----- */
-    function monthsLived(birthISO) {
+    /* ----- statum cuiusque puncti pingere (ex kalendario) ----- */
+    function paint() {
+      if (!birthISO) return;
       var birth = new Date(birthISO + "T00:00:00");
+      var bY = birth.getFullYear(), bM = birth.getMonth();   // mensis 0..11
       var now = new Date();
-      var m = (now.getFullYear() - birth.getFullYear()) * 12 +
-              (now.getMonth() - birth.getMonth());
-      if (now.getDate() < birth.getDate()) m--;   // mensis nondum completus
-      return Math.max(0, m);
-    }
+      var nY = now.getFullYear(), nM = now.getMonth();
 
-    /* ----- statum cuiusque puncti pingere ----- */
-    function paint(birthISO) {
-      var lived = Math.min(monthsLived(birthISO), TOTAL);
-      for (var i = 0; i < cells.length; i++) {
-        cells[i].className = "cell" + (i < lived ? " lived" : "");
+      for (var r = 0; r < YEARS; r++) {
+        var year = bY + r;
+        for (var c = 0; c < MONTHS; c++) {
+          var cell = cells[r * MONTHS + c];
+          cell.className = "cell";
+          var afterBirth = year > bY || (year === bY && c >= bM);
+          var notFuture  = year < nY || (year === nY && c <= nM);
+          if (afterBirth && notFuture) cell.classList.add("lived");
+          if (afterBirth && year === nY && c === nM) cell.classList.add("now");
+        }
       }
-      if (lived > 0 && lived <= TOTAL) cells[lived - 1].classList.add("now");
     }
 
     /* ----- cum die incipere ----- */
-    function start(birthISO) {
-      localStorage.setItem(STORAGE_KEY, birthISO);
+    function start(iso) {
+      birthISO = iso;
+      localStorage.setItem(STORAGE_KEY, iso);
       el.intro.classList.add("hidden");
       el.reset.hidden = false;
-      sizeDots();
-      paint(birthISO);
+      layout();
+      paint();
     }
 
     function pad2(n) { return String(n).padStart(2, "0"); }
@@ -474,8 +484,7 @@
       if (day < 1 || day > 31) {
         return { ok: false, msg: "Dies inter 1 et 31 esse debet." };
       }
-      // dies vera (reicit 31/02, etc.)
-      var dt = new Date(year, mon - 1, day);
+      var dt = new Date(year, mon - 1, day);   // dies vera (reicit 31/02)
       if (dt.getFullYear() !== year || dt.getMonth() !== mon - 1 || dt.getDate() !== day) {
         return { ok: false, msg: "Ea dies non exsistit." };
       }
@@ -521,13 +530,17 @@
 
       el.reset.addEventListener("click", function () {
         localStorage.removeItem(STORAGE_KEY);
+        birthISO = null;
         el.reset.hidden = true;
         el.error.textContent = "";
         el.intro.classList.remove("hidden");
         el.day.focus();
       });
 
-      window.addEventListener("resize", sizeDots);
+      window.addEventListener("resize", function () {
+        layout();
+        paint();
+      });
     }
 
     /* ----- initium ----- */
@@ -542,7 +555,7 @@
         el.day.value = parts[2];
         start(saved);
       } else {
-        sizeDots();   // tabulam post schermum initiale paratam relinquit
+        layout();   // tabulam post schermum initiale paratam relinquit
       }
     }
 
