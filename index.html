@@ -67,9 +67,9 @@
      * ================================================================ */
     .app {
       width: 100%;
-      max-width: 460px;
+      max-width: 720px;                    /* maximum: tabula verticalis */
       height: 100dvh;
-      padding: calc(env(safe-area-inset-top) + 1rem) .9rem
+      padding: calc(env(safe-area-inset-top) + 1rem) clamp(.9rem, 4vw, 2.4rem)
                calc(env(safe-area-inset-bottom) + .7rem);
       display: flex;
       flex-direction: column;
@@ -89,25 +89,21 @@
       gap: .5rem;
     }
 
-    /* una tabula (grid) tenet titulos et puncta ut recte congruant */
+    /* una tabula (grid) tenet titulos et puncta ut recte congruant;
+       columnae totam latitudinem implent, ordines compacti manent */
     .matrix {
+      width: 100%;
       display: grid;
-      grid-template-columns: var(--gutter) repeat(12, var(--cell));
+      grid-template-columns: var(--gutter) repeat(12, 1fr);
       grid-template-rows: auto repeat(80, var(--cell));
       align-items: center;
       justify-items: center;
     }
 
-    .corner { position: relative; }
     .corner small {
-      position: absolute;
-      right: 100%;
-      top: 50%;
-      transform: translateY(-50%);
+      font-size: .42rem;
+      letter-spacing: .02em;
       white-space: nowrap;
-      padding-right: .5em;
-      font-size: .5rem;
-      letter-spacing: .12em;
       color: var(--muted);
     }
     .mlabel { font-size: .56rem; color: #555; }
@@ -433,12 +429,15 @@
       var labelRowPx = 16;         // linea titulorum mensium
       var margin = 8;              // parvum spatium ne quid excedat
 
-      var cellW = (availW - gutterPx) / MONTHS;
-      var cellH = (availH - labelRowPx - margin) / YEARS;
-      var cell = Math.max(5, Math.floor(Math.min(cellW, cellH)));
+      // columnae totam latitudinem implent (1fr); --cell regit solum
+      // altitudinem ordinis. Punctum ex minore dimensione oritur.
+      var colW = (availW - gutterPx) / MONTHS;
+      var rowH = (availH - labelRowPx - margin) / YEARS;
+      var cell = Math.max(5, Math.floor(rowH));
 
       root.style.setProperty("--cell", cell + "px");
-      root.style.setProperty("--dot", Math.max(4, Math.round(cell * DOT_RATIO)) + "px");
+      root.style.setProperty("--dot",
+        Math.max(4, Math.round(Math.min(cell, colW) * DOT_RATIO)) + "px");
     }
 
     /* ----- statum cuiusque puncti pingere (ex kalendario) ----- */
