@@ -48,9 +48,28 @@
   <div class="intro" id="intro">
     <h1 class="title">MEMENTO MORI</h1>
     <p class="subtitle">Vivamos, ya que hemos de morir.</p>
-    <form class="intro-form" id="form">
-      <label for="birth">Tu fecha de nacimiento</label>
-      <input type="date" id="birth" required>
+
+    <form class="intro-form" id="form" novalidate>
+      <div class="date-fields">
+        <label class="field">
+          <input class="box" id="day" inputmode="numeric" maxlength="2"
+                 placeholder="DD" autocomplete="off" aria-label="Día">
+          <span class="flabel">DÍA</span>
+        </label>
+        <span class="sep">/</span>
+        <label class="field">
+          <input class="box" id="month" inputmode="numeric" maxlength="2"
+                 placeholder="MM" autocomplete="off" aria-label="Mes">
+          <span class="flabel">MES</span>
+        </label>
+        <span class="sep">/</span>
+        <label class="field field--year">
+          <input class="box" id="year" inputmode="numeric" maxlength="4"
+                 placeholder="AAAA" autocomplete="off" aria-label="Año">
+          <span class="flabel">AÑO</span>
+        </label>
+      </div>
+      <p class="error" id="error" role="alert"></p>
       <button type="submit">Comenzar</button>
     </form>
   </div>
