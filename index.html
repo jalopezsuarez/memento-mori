@@ -1,328 +1,60 @@
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Memento Mori</title>
-<style>
-  :root{
-    --ink:#111;
-    --paper:#f7f6f4;
-    --ring:#b9b7b2;
-    --dot:6px;
-    --gutter:2.1em;
-    font-size:clamp(11px, 3.4vw, 15px);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;width:100%;overflow:hidden}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:Georgia,"Times New Roman",serif;
-    -webkit-font-smoothing:antialiased;
-    display:flex;
-    justify-content:center;
-  }
-  .app{
-    width:100%;
-    max-width:460px;
-    height:100%;
-    height:100dvh;
-    padding:calc(env(safe-area-inset-top) + 1.1rem) 0.9rem calc(env(safe-area-inset-bottom) + 0.8rem);
-    display:flex;
-    flex-direction:column;
-  }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Memento Mori: visualiza tu vida en 80 años, mes a mes.">
+  <meta name="theme-color" content="#f7f6f4">
+  <title>Memento Mori</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-  /* ---------- header ---------- */
-  .title{
-    text-align:center;
-    font-weight:700;
-    letter-spacing:.42em;
-    font-size:1.9rem;
-    padding-left:.42em;
-    line-height:1;
-  }
-  .subtitle{
-    text-align:center;
-    font-style:italic;
-    font-size:.98rem;
-    margin-top:.5rem;
-    color:#2a2a2a;
-  }
+  <!-- Pantalla principal: la cuadrícula de la vida -->
+  <main class="app">
+    <header class="head">
+      <h1 class="title">MEMENTO MORI</h1>
+      <p class="subtitle">Vivamos, ya que hemos de morir.</p>
+    </header>
 
-  /* ---------- chart ---------- */
-  .chart{
-    flex:1 1 auto;
-    display:flex;
-    flex-direction:column;
-    min-height:0;
-    margin-top:1.05rem;
-  }
-  .axis-top{display:flex;align-items:flex-end}
-  .corner{width:var(--gutter);flex:0 0 var(--gutter);text-align:center}
-  .corner small{
-    display:block;
-    font-size:.5rem;
-    letter-spacing:.12em;
-    color:#666;
-    transform:translateY(-2px);
-  }
-  .months{
-    flex:1 1 auto;
-    display:grid;
-    grid-template-columns:repeat(12,1fr);
-    font-size:.58rem;
-    color:#555;
-    text-align:center;
-    padding-bottom:.28rem;
-  }
-  .months span{line-height:1}
+    <section class="chart">
+      <div class="axis-top">
+        <div class="corner"><small>MESES</small></div>
+        <div class="months" id="months" aria-hidden="true"></div>
+      </div>
 
-  .axis-main{flex:1 1 auto;display:flex;min-height:0}
-  .years{
-    width:var(--gutter);
-    flex:0 0 var(--gutter);
-    display:grid;
-    grid-template-rows:repeat(80,1fr);
-    font-size:.56rem;
-    color:#555;
-  }
-  .years b{
-    grid-column:1;
-    align-self:center;
-    justify-self:end;
-    padding-right:.35rem;
-    font-weight:400;
-  }
+      <div class="axis-main">
+        <div class="years" id="years" aria-hidden="true"></div>
+        <div class="grid-wrap">
+          <div class="dots" id="dots" role="img" aria-label="Meses vividos de una vida de 80 años"></div>
+        </div>
+      </div>
 
-  .grid-wrap{flex:1 1 auto;min-width:0}
-  .dots{
-    width:100%;
-    height:100%;
-    display:grid;
-    grid-template-columns:repeat(12,1fr);
-    grid-template-rows:repeat(80,1fr);
-  }
-  .cell{display:flex;align-items:center;justify-content:center}
-  .cell i{
-    width:var(--dot);
-    height:var(--dot);
-    border-radius:50%;
-    border:1px solid var(--ring);
-    background:transparent;
-    transition:background .18s ease, border-color .18s ease;
-  }
-  .cell.lived i{background:var(--ink);border-color:var(--ink)}
-  .cell.now i{background:var(--ink);border-color:var(--ink);box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+      <p class="axis-caption">
+        <span class="arrow">&larr;</span> AÑOS (1&ndash;80) <span class="arrow">&rarr;</span>
+      </p>
+    </section>
 
-  /* axis captions */
-  .axis-caption{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:.6rem;
-    letter-spacing:.28em;
-    font-size:.66rem;
-    margin-top:.55rem;
-    color:#333;
-    padding-left:.28em;
-  }
-  .axis-caption .arrow{color:#888;font-size:.8rem}
+    <footer class="quote">
+      <span class="mark">&ldquo;</span>
+      <p>Cuando te levantes por la mañana, piensa en el privilegio tan precioso que es estar vivo: respirar, pensar, disfrutar, amar.</p>
+      <span class="author">MARCO AURELIO</span>
+    </footer>
+  </main>
 
-  /* ---------- quote ---------- */
-  .quote{
-    text-align:center;
-    margin-top:.7rem;
-  }
-  .quote .mark{font-size:1.4rem;line-height:.4;display:block}
-  .quote p{
-    font-style:italic;
-    font-size:.86rem;
-    line-height:1.35;
-    margin-top:.35rem;
-    padding:0 .3rem;
-  }
-  .quote .author{
-    display:block;
-    margin-top:.6rem;
-    font-style:normal;
-    font-size:.62rem;
-    letter-spacing:.34em;
-    padding-left:.34em;
-    color:#333;
-  }
+  <button class="reset" id="reset" type="button" hidden>fecha</button>
 
-  .reset{
-    position:fixed;
-    top:calc(env(safe-area-inset-top) + 6px);
-    right:10px;
-    background:none;border:none;
-    font-family:inherit;font-size:.6rem;letter-spacing:.1em;
-    color:#b3b1ac;cursor:pointer;
-  }
+  <!-- Pantalla de inicio: fecha de nacimiento -->
+  <div class="intro" id="intro">
+    <h1 class="title">MEMENTO MORI</h1>
+    <p class="subtitle">Vivamos, ya que hemos de morir.</p>
+    <form class="intro-form" id="form">
+      <label for="birth">Tu fecha de nacimiento</label>
+      <input type="date" id="birth" required>
+      <button type="submit">Comenzar</button>
+    </form>
+  </div>
 
-  /* ---------- birthdate overlay ---------- */
-  .overlay{
-    position:fixed;inset:0;
-    background:var(--paper);
-    display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    gap:1.4rem;padding:2rem;
-    text-align:center;
-    z-index:20;
-  }
-  .overlay.hidden{display:none}
-  .overlay h1{
-    font-weight:700;letter-spacing:.4em;font-size:1.6rem;padding-left:.4em;
-  }
-  .overlay p{font-style:italic;font-size:1rem;color:#333;max-width:22rem}
-  .overlay form{display:flex;flex-direction:column;gap:1rem;align-items:center}
-  .overlay label{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:#666}
-  .overlay input{
-    font-family:inherit;font-size:1.05rem;
-    padding:.6rem .8rem;
-    border:1px solid #ccc;border-radius:2px;
-    background:#fff;color:var(--ink);text-align:center;
-  }
-  .overlay button{
-    font-family:inherit;font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;
-    padding:.7rem 2.2rem;
-    background:var(--ink);color:var(--paper);
-    border:none;border-radius:2px;cursor:pointer;padding-left:calc(2.2rem + .28em);
-  }
-</style>
-
-<div class="app" aria-hidden="false">
-  <header>
-    <div class="title">MEMENTO MORI</div>
-    <div class="subtitle">Vivamos, ya que hemos de morir.</div>
-  </header>
-
-  <section class="chart">
-    <div class="axis-top">
-      <div class="corner"><small>MESES</small></div>
-      <div class="months" id="months"></div>
-    </div>
-    <div class="axis-main">
-      <div class="years" id="years"></div>
-      <div class="grid-wrap"><div class="dots" id="dots"></div></div>
-    </div>
-    <div class="axis-caption">
-      <span class="arrow">&larr;</span> AÑOS (1&ndash;80) <span class="arrow">&rarr;</span>
-    </div>
-  </section>
-
-  <footer class="quote">
-    <span class="mark">&ldquo;</span>
-    <p>Cuando te levantes por la mañana, piensa en el privilegio tan precioso que es estar vivo: respirar, pensar, disfrutar, amar.</p>
-    <span class="author">MARCO AURELIO</span>
-  </footer>
-</div>
-
-<button class="reset" id="reset" hidden>fecha</button>
-
-<div class="overlay" id="overlay">
-  <h1>MEMENTO MORI</h1>
-  <p>Vivamos, ya que hemos de morir.</p>
-  <form id="form">
-    <label for="birth">Tu fecha de nacimiento</label>
-    <input type="date" id="birth" required max="">
-    <button type="submit">Comenzar</button>
-  </form>
-</div>
-
-<script>
-(function(){
-  var YEARS = 80, MONTHS = 12, TOTAL = YEARS * MONTHS;
-  var KEY = "mementoMori.birth";
-
-  var monthsEl = document.getElementById("months");
-  var yearsEl  = document.getElementById("years");
-  var dotsEl   = document.getElementById("dots");
-  var overlay  = document.getElementById("overlay");
-  var form     = document.getElementById("form");
-  var birthInp = document.getElementById("birth");
-  var resetBtn = document.getElementById("reset");
-
-  // month labels 1..12 across the top
-  for(var m=1;m<=MONTHS;m++){
-    var s=document.createElement("span");
-    s.textContent=m;
-    monthsEl.appendChild(s);
-  }
-  // year labels every 10 down the left (row aligned)
-  for(var y=1;y<=YEARS;y++){
-    var b=document.createElement("b");
-    b.style.gridRow=y;
-    b.textContent = (y % 10 === 0) ? y : "";
-    yearsEl.appendChild(b);
-  }
-  // dots — row = year (top→down), col = month (left→right)
-  var cells=[];
-  for(var yr=0; yr<YEARS; yr++){
-    for(var mo=0; mo<MONTHS; mo++){
-      var c=document.createElement("div");
-      c.className="cell";
-      c.appendChild(document.createElement("i"));
-      dotsEl.appendChild(c);
-      cells.push(c);
-    }
-  }
-
-  // keep dots perfectly round and inside their cells (no scroll ever)
-  function sizeDots(){
-    var w = dotsEl.clientWidth, h = dotsEl.clientHeight;
-    if(!w || !h) return;
-    var d = Math.max(3, Math.floor(Math.min(w/MONTHS, h/YEARS) * 0.66));
-    document.documentElement.style.setProperty("--dot", d + "px");
-  }
-
-  function monthsLived(birthStr){
-    var b = new Date(birthStr + "T00:00:00");
-    var n = new Date();
-    var m = (n.getFullYear()-b.getFullYear())*12 + (n.getMonth()-b.getMonth());
-    if(n.getDate() < b.getDate()) m--;      // month not yet completed
-    return Math.max(0, m);
-  }
-
-  function paint(birthStr){
-    var lived = Math.min(monthsLived(birthStr), TOTAL);
-    for(var i=0;i<cells.length;i++){
-      cells[i].classList.remove("lived","now");
-      if(i < lived) cells[i].classList.add("lived");
-    }
-    if(lived>0 && lived<=TOTAL) cells[lived-1].classList.add("now");
-  }
-
-  function start(birthStr){
-    localStorage.setItem(KEY, birthStr);
-    overlay.classList.add("hidden");
-    resetBtn.hidden=false;
-    sizeDots();
-    paint(birthStr);
-  }
-
-  // limit the picker to today
-  var today=new Date();
-  birthInp.max = today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
-
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-    if(birthInp.value) start(birthInp.value);
-  });
-
-  resetBtn.addEventListener("click", function(){
-    localStorage.removeItem(KEY);
-    overlay.classList.remove("hidden");
-    resetBtn.hidden=true;
-    if(saved) birthInp.value = saved;
-  });
-
-  window.addEventListener("resize", function(){ sizeDots(); });
-
-  var saved = localStorage.getItem(KEY);
-  if(saved){
-    birthInp.value = saved;
-    start(saved);
-  }else{
-    sizeDots();
-  }
-})();
-</script>
+  <script src="app.js"></script>
+</body>
+</html>
