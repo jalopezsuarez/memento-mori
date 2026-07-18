@@ -92,7 +92,7 @@
     /* una tabula (grid) tenet titulos et puncta ut recte congruant;
        columnae totam latitudinem implent, ordines compacti manent */
     .matrix {
-      width: 100%;
+      width: 70%;
       display: grid;
       grid-template-columns: var(--gutter) repeat(12, 1fr);
       grid-template-rows: auto repeat(80, var(--cell));
@@ -354,6 +354,7 @@
     var MONTHS = 12;
     var STORAGE_KEY = "mementoMori.birth";
     var DOT_RATIO = 0.8;           /* magnitudo puncti intra cellulam */
+    var MATRIX_WIDTH = 0.70;       /* tabula = 70% latitudinis (congruit CSS) */
     var root = document.documentElement;
 
     var el = {
@@ -431,7 +432,7 @@
 
       // columnae totam latitudinem implent (1fr); --cell regit solum
       // altitudinem ordinis. Punctum ex minore dimensione oritur.
-      var colW = (availW - gutterPx) / MONTHS;
+      var colW = (availW * MATRIX_WIDTH - gutterPx) / MONTHS;
       var rowH = (availH - labelRowPx - margin) / YEARS;
       var cell = Math.max(5, Math.floor(rowH));
 
