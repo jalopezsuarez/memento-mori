@@ -225,16 +225,17 @@
       line-height: 1;
       color: var(--ink);
       text-align: center;
-      background: #fff;
-      border: 1px solid #e2e0db;
-      border-radius: 3px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #d8d5cf;
+      border-radius: 0;
       padding: .38em 0;
       transition: border-color .18s ease;
     }
     .field--year .box { width: 3.7em; }
     .box::placeholder { color: #cfccc6; letter-spacing: .02em; }
-    .box:focus { outline: none; border-color: var(--ink); }
-    .box.invalid { border-color: var(--error); }
+    .box:focus { outline: none; border-bottom-color: var(--ink); }
+    .box.invalid { border-bottom-color: var(--error); }
     .flabel {
       font-size: .58rem;
       letter-spacing: .24em;
