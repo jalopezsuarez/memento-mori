@@ -23,10 +23,12 @@
       --error: #b23a3a;
       --dot:   9px;               /* a JavaScript pro spatio recomputatur */
       --gutter: 1.7em;
+      font-size: 13px;                     /* fallback pro navigatoribus antiquis */
       font-size: clamp(11px, 3.4vw, 15px);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
 
     html, body {
       width: 100%;
@@ -67,9 +69,12 @@
     .app {
       width: 100%;
       max-width: 720px;                    /* maximum: tabula verticalis */
+      height: 100vh;                       /* fallback pro navigatoribus antiquis */
       height: 100dvh;
-      padding: calc(env(safe-area-inset-top) + 1rem) clamp(.9rem, 4vw, 2.4rem)
-               calc(env(safe-area-inset-bottom) + 2.2rem);
+      padding: 1rem 1.2rem .8rem;          /* fallback sine env() */
+      padding: calc(env(safe-area-inset-top) + 1rem)
+               clamp(.9rem, 4vw, 2.4rem)
+               calc(env(safe-area-inset-bottom) + .8rem);
       display: flex;
       flex-direction: column;
     }
@@ -84,9 +89,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;   /* tabula sub titulo; aer ad imum (footer) */
+      justify-content: center;       /* in medio verticaliter, sine aere superfluo */
       gap: .5rem;
-      margin-top: 1rem;
     }
 
     /* una tabula (grid) tenet titulos et puncta ut recte congruant;
@@ -150,6 +154,7 @@
     /* ----- pyxis occulta ut dies mutetur ----- */
     .reset {
       position: fixed;
+      top: 6px;                        /* fallback sine env() */
       top: calc(env(safe-area-inset-top) + 6px);
       right: 10px;
       border: none;
@@ -167,7 +172,7 @@
      * ================================================================ */
     .intro {
       position: fixed;
-      inset: 0;
+      top: 0; right: 0; bottom: 0; left: 0;   /* pro 'inset: 0' compatibile */
       z-index: 20;
       background: #fff;
       display: flex;
@@ -175,11 +180,12 @@
       align-items: center;
       justify-content: center;
       gap: 2rem;
+      padding: 2rem 1.4rem;            /* fallback */
       padding: 2rem 1.4rem calc(env(safe-area-inset-bottom) + 2rem);
     }
     .intro.hidden { display: none; }
 
-    .intro .title { font-size: clamp(1.4rem, 6.4vw, 1.95rem); }
+    .intro .title { font-size: 1.7rem; font-size: clamp(1.4rem, 6.4vw, 1.95rem); }
     .intro .subtitle { font-size: 1.02rem; margin-top: -1.1rem; }
 
     .intro-form {
@@ -199,6 +205,7 @@
       justify-content: center;
       gap: .3rem;
       width: 100%;
+      font-size: 1.7rem;               /* fallback */
       font-size: clamp(1.35rem, 6.8vw, 2rem);
     }
     .field {
@@ -349,6 +356,11 @@
     var cells = [];                /* cells[(annus-1)*12 + (mensis-1)] */
     var birthISO = null;
 
+    /* ----- accessus tutus ad localStorage (ne umquam erret) ----- */
+    function storeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    function storeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
     /* ----- tabulam semel aedificare ----- */
     function build() {
       var frag = document.createDocumentFragment();
@@ -446,14 +458,14 @@
     /* ----- cum die incipere ----- */
     function start(iso) {
       birthISO = iso;
-      localStorage.setItem(STORAGE_KEY, iso);
+      storeSet(STORAGE_KEY, iso);
       el.intro.classList.add("hidden");
       el.reset.hidden = false;
       layout();
       paint();
     }
 
-    function pad2(n) { return String(n).padStart(2, "0"); }
+    function pad2(n) { return (n < 10 ? "0" : "") + n; }
 
     /* ----- diem / mensem / annum probare ----- */
     function validate(dd, mm, yy) {
@@ -518,7 +530,7 @@
       });
 
       el.reset.addEventListener("click", function () {
-        localStorage.removeItem(STORAGE_KEY);
+        storeDel(STORAGE_KEY);
         birthISO = null;
         el.reset.hidden = true;
         el.error.textContent = "";
@@ -536,7 +548,7 @@
     function init() {
       build();
       bind();
-      var saved = localStorage.getItem(STORAGE_KEY);
+      var saved = storeGet(STORAGE_KEY);
       if (saved && /^\d{4}-\d{2}-\d{2}$/.test(saved)) {
         var parts = saved.split("-");
         el.year.value = parts[0];
