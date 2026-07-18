@@ -148,23 +148,14 @@
     }
     .axis-caption .arrow { color: #888; font-size: .8rem; }
 
-    /* ----- sententia ----- */
-    .quote { text-align: center; margin-top: .6rem; }
-    .quote .mark { display: block; font-size: 1.4rem; line-height: .4; }
-    .quote p {
-      margin-top: .35rem;
-      padding: 0 .3rem;
-      font-style: italic;
-      font-size: .86rem;
-      line-height: 1.35;
-    }
-    .quote .author {
+    /* ----- signum citationis apud subtitulum ----- */
+    .head .mark {
       display: block;
-      margin-top: .55rem;
-      font-size: .62rem;
-      letter-spacing: .34em;
-      padding-left: .34em;
-      color: #333;
+      text-align: center;
+      margin-top: .35rem;
+      font-size: 1.5rem;
+      line-height: .5;
+      color: var(--ink);
     }
 
     /* ----- pyxis occulta ut dies mutetur ----- */
@@ -288,6 +279,7 @@
   <main class="app">
     <header class="head">
       <h1 class="title">MEMENTO MORI</h1>
+      <span class="mark">&ldquo;</span>
       <p class="subtitle">Vivamus, quia moriendum est.</p>
     </header>
 
@@ -297,12 +289,6 @@
         <span class="arrow">&larr;</span> ANNI (1&ndash;80) <span class="arrow">&rarr;</span>
       </p>
     </section>
-
-    <footer class="quote">
-      <span class="mark">&ldquo;</span>
-      <p>Cum mane surrexeris, cogita quam pretiosum sit munus vivere: spirare, cogitare, frui, amare.</p>
-      <span class="author">MARCUS AURELIUS</span>
-    </footer>
   </main>
 
   <button class="reset" id="reset" type="button" hidden>mutare</button>
