@@ -1,606 +1,452 @@
 <!DOCTYPE html>
 <html lang="la">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="description" content="Memento mori: vitam tuam per octoginta annos, mensem post mensem, contemplare.">
-  <meta name="theme-color" content="#f7f6f4">
-  <title>Memento Mori</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="description" content="Memento mori: vitam tuam per octoginta annos, mensem post mensem, contemplare.">
+<meta name="theme-color" content="#f7f6f4">
+<title>Memento Mori</title>
+<style>
+/* Memento Mori — pagina una, sine ope externa.
+   Anni in axe verticali, menses in horizontali. Tabula 9:16, sine scroll. */
 
-  <style>
-    /* ================================================================ *
-     * Memento Mori — pagina una, sine ope externa (HTML/CSS/JS purus).
-     * Forma verticalis telephono apta: anni in axe verticali, menses
-     * (Ianuarius..December) in horizontali. Tabula compacta, in medio
-     * schermi collocata, sine volumine (nulla scroll).
-     * ================================================================ */
+:root {
+  --ink: #111;
+  --paper: #f7f6f4;
+  --ring: #b9b7b2;
+  --muted: #666;
+  --error: #b23a3a;
+  --dot: 9px;              /* a JavaScript pro spatio ponitur */
+  --gutter: 1.7em;
+  font-size: 13px;         /* basis pro unitatibus rem */
+}
 
-    :root {
-      --ink:   #111;
-      --paper: #f7f6f4;
-      --ring:  #b9b7b2;
-      --muted: #666;
-      --error: #b23a3a;
-      --dot:   9px;               /* a JavaScript pro spatio recomputatur */
-      --gutter: 1.7em;
-      font-size: 13px;                     /* fallback pro navigatoribus antiquis */
-      font-size: clamp(11px, 3.4vw, 15px);
-    }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    [hidden] { display: none !important; }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;   /* nullum zoom per duplicem tactum */
+}
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      touch-action: manipulation;      /* nullum zoom per duplicem tactum */
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
-      overscroll-behavior: none;
-    }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  display: flex;
+  justify-content: center;
+}
 
-    body {
-      background: var(--paper);
-      color: var(--ink);
-      font-family: Georgia, "Times New Roman", serif;
-      -webkit-font-smoothing: antialiased;
-      display: flex;
-      justify-content: center;
-    }
+/* typographia communis */
+.title {
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: .38em;
+  padding-left: .38em;
+  line-height: 1;
+}
+.subtitle {
+  text-align: center;
+  font-style: italic;
+  color: #2a2a2a;
+}
 
-    /* ----- typographia communis ----- */
-    .title {
-      text-align: center;
-      font-weight: 700;
-      letter-spacing: .42em;
-      padding-left: .42em;          /* spatium finale pensat */
-      line-height: 1;
-    }
-    .subtitle {
-      text-align: center;
-      font-style: italic;
-      color: #2a2a2a;
-    }
+/* schermum principale */
+.app {
+  width: 100%;
+  max-width: 720px;
+  height: 100%;
+  padding: 1rem 1.2rem .8rem;
+  display: flex;
+  flex-direction: column;
+}
+.head .title { font-size: 1.85rem; }
+.head .subtitle { font-size: .98rem; margin-top: .5rem; }
 
-    /* ================================================================ *
-     * Schermum principale — tabula vitae
-     * ================================================================ */
-    .app {
-      width: 100%;
-      max-width: 720px;                    /* maximum: tabula verticalis */
-      height: 100vh;                       /* fallback pro navigatoribus antiquis */
-      height: 100dvh;
-      padding: 1rem 1.2rem .8rem;          /* fallback sine env() */
-      padding: calc(env(safe-area-inset-top) + 1rem)
-               clamp(.9rem, 4vw, 2.4rem)
-               calc(env(safe-area-inset-bottom) + .8rem);
-      display: flex;
-      flex-direction: column;
-    }
+.chart {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-    .head .title { font-size: 1.9rem; }
-    .head .subtitle { font-size: .98rem; margin-top: .5rem; }
+/* tabula: tituli et puncta in una grid ut congruant */
+.matrix {
+  display: grid;
+  grid-template-columns: var(--gutter) repeat(12, 1fr);
+  grid-template-rows: auto repeat(80, 1fr);
+  align-items: center;
+  justify-items: center;
+}
+.corner small {
+  font-size: .42rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.mlabel { font-size: .56rem; color: #555; }
+.ylabel {
+  justify-self: end;
+  padding-right: .5em;
+  font-size: .54rem;
+  color: #555;
+}
+.cell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cell i {
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  border: 1px solid var(--ring);
+  transition: background .18s, border-color .18s;
+}
+.cell.lived i, .cell.now i { background: var(--ink); border-color: var(--ink); }
+.cell.now i { box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink); }
 
-    /* ----- area tabulae: in medio verticaliter et horizontaliter ----- */
-    .chart {
-      flex: 1 1 auto;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;       /* in medio verticaliter, sine aere superfluo */
-      gap: .5rem;
-    }
+.caption {
+  margin-top: .55rem;
+  padding-left: .28em;
+  font-size: .66rem;
+  letter-spacing: .28em;
+  color: #333;
+}
+.caption .arrow { color: #888; margin: 0 .4em; }
 
-    /* una tabula (grid) tenet titulos et puncta ut recte congruant;
-       magnitudo (proportio 9:16 verticalis) a JavaScript ponitur */
-    .matrix {
-      display: grid;
-      grid-template-columns: var(--gutter) repeat(12, 1fr);
-      grid-template-rows: auto repeat(80, 1fr);
-      align-items: center;
-      justify-items: center;
-    }
+/* pyxis occulta ut dies mutetur */
+.reset {
+  position: fixed;
+  top: 6px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: .6rem;
+  letter-spacing: .1em;
+  color: #b3b1ac;
+  cursor: pointer;
+}
 
-    .corner small {
-      font-size: .42rem;
-      letter-spacing: .02em;
-      white-space: nowrap;
-      color: var(--muted);
-    }
-    .mlabel { font-size: .56rem; color: #555; }
-    .ylabel {
-      justify-self: end;
-      padding-right: .5em;
-      font-size: .54rem;
-      color: #555;
-    }
+/* schermum initiale: dies natalis */
+.intro {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: 20;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.4rem;
+  text-align: center;
+}
+.intro.hidden { display: none; }
+.intro .title { font-size: 1.7rem; }
+.intro .subtitle { font-size: 1.02rem; margin-top: .5rem; }
 
-    .cell {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .cell i {
-      width: var(--dot);
-      height: var(--dot);
-      border-radius: 50%;
-      border: 1px solid var(--ring);
-      background: transparent;
-      transition: background .18s ease, border-color .18s ease;
-    }
-    .cell.lived i { background: var(--ink); border-color: var(--ink); }
-    .cell.now i {
-      background: var(--ink);
-      border-color: var(--ink);
-      box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink);
-    }
-
-    .axis-caption {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: .6rem;
-      padding-left: .28em;
-      font-size: .66rem;
-      letter-spacing: .28em;
-      color: #333;
-    }
-    .axis-caption .arrow { color: #888; font-size: .8rem; }
-
-    /* ----- pyxis occulta ut dies mutetur ----- */
-    .reset {
-      position: fixed;
-      top: 6px;                        /* fallback sine env() */
-      top: calc(env(safe-area-inset-top) + 6px);
-      right: 10px;
-      border: none;
-      background: none;
-      font-family: inherit;
-      font-size: .6rem;
-      letter-spacing: .1em;
-      color: #b3b1ac;
-      cursor: pointer;
-    }
-    .reset:hover { color: var(--muted); }
-
-    /* ================================================================ *
-     * Schermum initiale (dies natalis) — minimum, in albo
-     * ================================================================ */
-    .intro {
-      position: fixed;
-      top: 0; right: 0; bottom: 0; left: 0;   /* pro 'inset: 0' compatibile */
-      z-index: 20;
-      background: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2rem;
-      padding: 2rem 1.4rem;            /* fallback */
-      padding: 2rem 1.4rem calc(env(safe-area-inset-bottom) + 2rem);
-    }
-    .intro.hidden { display: none; }
-
-    .intro .title { font-size: 1.7rem; font-size: clamp(1.4rem, 6.4vw, 1.95rem); }
-    .intro .subtitle { font-size: 1.02rem; margin-top: -1.1rem; }
-
-    .intro-form {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.2rem;
-      margin-top: 1.2rem;
-      width: 100%;
-      max-width: 360px;
-    }
-
-    /* pyxides diei / mensis / anni */
-    .date-fields {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: .3rem;
-      width: 100%;
-      font-size: 1.7rem;               /* fallback */
-      font-size: clamp(1.35rem, 6.8vw, 2rem);
-    }
-    .field {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: .55rem;
-    }
-    .box {
-      width: 2.3em;
-      font-family: inherit;
-      font-size: 1em;
-      line-height: 1;
-      color: var(--ink);
-      text-align: center;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #d8d5cf;
-      border-radius: 0;
-      padding: .38em 0;
-      transition: border-color .18s ease;
-    }
-    .field--year .box { width: 3.7em; }
-    .box::placeholder { color: #cfccc6; letter-spacing: .02em; }
-    .box:focus { outline: none; border-bottom-color: var(--ink); }
-    .box.invalid { border-bottom-color: var(--error); }
-    .flabel {
-      font-size: .58rem;
-      letter-spacing: .24em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .sep {
-      align-self: center;
-      margin-top: .45em;
-      font-size: .95em;
-      color: #d8d6d1;
-    }
-
-    .error {
-      min-height: 1.1em;
-      font-style: italic;
-      font-size: .82rem;
-      color: var(--error);
-      text-align: center;
-    }
-
-    .intro-form button {
-      font-family: inherit;
-      font-size: .78rem;
-      letter-spacing: .34em;
-      text-transform: uppercase;
-      padding: .25rem 0 .35rem;
-      padding-left: .34em;
-      border: none;
-      border-bottom: 1px solid var(--ink);
-      background: none;
-      color: var(--ink);
-      cursor: pointer;
-    }
-    .intro-form button:hover { opacity: .55; }
-  </style>
+.intro-form { margin-top: 2rem; }
+.date-fields { font-size: 1.7rem; }
+.field {
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+}
+.box {
+  display: block;
+  width: 2.3em;
+  font-family: inherit;
+  font-size: 1em;
+  line-height: 1;
+  color: var(--ink);
+  text-align: center;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #d8d5cf;
+  padding: .38em 0;
+}
+.field--year .box { width: 3.7em; }
+.box:focus { outline: none; border-bottom-color: var(--ink); }
+.box.invalid { border-bottom-color: var(--error); }
+.flabel {
+  display: block;
+  margin-top: .55rem;
+  font-size: .58rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.sep {
+  display: inline-block;
+  vertical-align: top;
+  margin: .4em .3rem 0;
+  font-size: .95em;
+  color: #d8d6d1;
+}
+.error {
+  min-height: 1.1em;
+  margin-top: 1.2rem;
+  font-style: italic;
+  font-size: .82rem;
+  color: var(--error);
+}
+.submit {
+  margin-top: 1.2rem;
+  font-family: inherit;
+  font-size: .78rem;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  padding: .25rem 0 .35rem .34em;
+  border: none;
+  border-bottom: 1px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+</style>
 </head>
-
 <body>
 
-  <!-- Schermum principale: tabula vitae -->
-  <main class="app">
-    <header class="head">
-      <h1 class="title">MEMENTO MORI</h1>
-      <p class="subtitle">Vivamus, quia moriendum est.</p>
-    </header>
-
-    <section class="chart" id="chart">
-      <div class="matrix" id="matrix" role="img" aria-label="Menses vitae per octoginta annos"></div>
-      <p class="axis-caption" id="caption">
-        <span class="arrow">&larr;</span> ANNI (1&ndash;80) <span class="arrow">&rarr;</span>
-      </p>
-    </section>
-  </main>
-
-  <button class="reset" id="reset" type="button" hidden>mutare</button>
-
-  <!-- Schermum initiale: dies natalis -->
-  <div class="intro" id="intro">
+<main class="app">
+  <header class="head">
     <h1 class="title">MEMENTO MORI</h1>
     <p class="subtitle">Vivamus, quia moriendum est.</p>
+  </header>
 
-    <form class="intro-form" id="form" novalidate>
-      <div class="date-fields">
-        <label class="field">
-          <input class="box" id="day" inputmode="numeric" maxlength="2"
-                 placeholder="DD" autocomplete="off" aria-label="Dies">
-          <span class="flabel">DIES</span>
-        </label>
-        <span class="sep">/</span>
-        <label class="field">
-          <input class="box" id="month" inputmode="numeric" maxlength="2"
-                 placeholder="MM" autocomplete="off" aria-label="Mensis">
-          <span class="flabel">MENSIS</span>
-        </label>
-        <span class="sep">/</span>
-        <label class="field field--year">
-          <input class="box" id="year" inputmode="numeric" maxlength="4"
-                 placeholder="AAAA" autocomplete="off" aria-label="Annus">
-          <span class="flabel">ANNUS</span>
-        </label>
-      </div>
-      <p class="error" id="error" role="alert"></p>
-      <button type="submit">Incipe</button>
-    </form>
-  </div>
+  <section class="chart" id="chart">
+    <div class="matrix" id="matrix" role="img" aria-label="Menses vitae per octoginta annos"></div>
+    <p class="caption" id="caption">
+      <span class="arrow">&larr;</span>ANNI (1&ndash;80)<span class="arrow">&rarr;</span>
+    </p>
+  </section>
+</main>
 
-  <script>
-  /* ================================================================== *
-   * Ratio applicationis.
-   *
-   * Ordines sunt anni vitae (axis verticalis, 1..80), columnae menses
-   * kalendarii (Ianuarius=1 .. December=12, axis horizontalis). Quisque
-   * ordo unum annum kalendarii repraesentat, ab anno nativitatis. Menses
-   * a die natali usque ad mensem currentem implentur; mensis currens
-   * signatur. Dies natalis in localStorage servatur.
-   * ================================================================== */
-  (function () {
-    "use strict";
+<button class="reset" id="reset" type="button" hidden>mutare</button>
 
-    var YEARS = 80;
-    var MONTHS = 12;
-    var STORAGE_KEY = "mementoMori.birth";
-    var DOT_RATIO = 0.8;           /* magnitudo puncti intra cellulam */
-    var MAX_WIDTH = 0.72;          /* latitudo maxima tabulae (pars schermi) */
-    var ASPECT = 9 / 16;           /* latitudo:altitudo = 9:16 (verticalis) */
-    var root = document.documentElement;
+<div class="intro" id="intro">
+  <h1 class="title">MEMENTO MORI</h1>
+  <p class="subtitle">Vivamus, quia moriendum est.</p>
+  <form class="intro-form" id="form" novalidate>
+    <div class="date-fields"
+      ><span class="field"><input class="box" id="day" inputmode="numeric" maxlength="2" placeholder="DD" autocomplete="off" aria-label="Dies"><span class="flabel">DIES</span></span
+      ><span class="sep">/</span
+      ><span class="field"><input class="box" id="month" inputmode="numeric" maxlength="2" placeholder="MM" autocomplete="off" aria-label="Mensis"><span class="flabel">MENSIS</span></span
+      ><span class="sep">/</span
+      ><span class="field field--year"><input class="box" id="year" inputmode="numeric" maxlength="4" placeholder="AAAA" autocomplete="off" aria-label="Annus"><span class="flabel">ANNUS</span></span
+    ></div>
+    <p class="error" id="error" role="alert"></p>
+    <button class="submit" type="submit">Incipe</button>
+  </form>
+</div>
 
-    var el = {
-      matrix:  document.getElementById("matrix"),
-      chart:   document.getElementById("chart"),
-      caption: document.getElementById("caption"),
-      intro:   document.getElementById("intro"),
-      form:    document.getElementById("form"),
-      day:     document.getElementById("day"),
-      month:   document.getElementById("month"),
-      year:    document.getElementById("year"),
-      error:   document.getElementById("error"),
-      reset:   document.getElementById("reset")
+<script>
+/* Ordines = anni vitae (1..80). Columnae = menses kalendarii (1..12).
+   Quisque ordo unum annum kalendarii ab anno nativitatis repraesentat.
+   Menses a die natali usque ad mensem currentem implentur; currens signatur.
+   Dies natalis in localStorage servatur. */
+(function () {
+  "use strict";
+
+  var YEARS = 80, MONTHS = 12;
+  var KEY = "mementoMori.birth";
+  var DOT_RATIO = 0.8;          // magnitudo puncti intra cellulam
+  var MAX_WIDTH = 0.72;         // latitudo maxima tabulae (pars schermi)
+  var ASPECT = 9 / 16;          // latitudo : altitudo (verticalis)
+  var root = document.documentElement;
+
+  var matrix = document.getElementById("matrix");
+  var chart = document.getElementById("chart");
+  var caption = document.getElementById("caption");
+  var intro = document.getElementById("intro");
+  var form = document.getElementById("form");
+  var dayI = document.getElementById("day");
+  var monI = document.getElementById("month");
+  var yeaI = document.getElementById("year");
+  var errorEl = document.getElementById("error");
+  var resetB = document.getElementById("reset");
+
+  var cells = [];
+  var birthISO = null;
+
+  // tabulam semel aedificare
+  function build() {
+    var frag = document.createDocumentFragment(), i, j, node, small;
+
+    node = document.createElement("div");
+    node.className = "corner";
+    node.style.gridArea = "1 / 1";
+    small = document.createElement("small");
+    small.textContent = "MENSES";
+    node.appendChild(small);
+    frag.appendChild(node);
+
+    for (i = 1; i <= MONTHS; i++) {
+      node = document.createElement("div");
+      node.className = "mlabel";
+      node.style.gridArea = "1 / " + (i + 1);
+      node.textContent = i;
+      frag.appendChild(node);
+    }
+
+    for (i = 10; i <= YEARS; i += 10) {
+      node = document.createElement("div");
+      node.className = "ylabel";
+      node.style.gridArea = (i + 1) + " / 1";
+      node.textContent = i;
+      frag.appendChild(node);
+    }
+
+    for (i = 1; i <= YEARS; i++) {
+      for (j = 1; j <= MONTHS; j++) {
+        node = document.createElement("div");
+        node.className = "cell";
+        node.style.gridArea = (i + 1) + " / " + (j + 1);
+        node.appendChild(document.createElement("i"));
+        cells.push(node);
+        frag.appendChild(node);
+      }
+    }
+
+    matrix.appendChild(frag);
+  }
+
+  // magnitudo tabulae (9:16) et puncti
+  function layout() {
+    var availW = chart.clientWidth;
+    var availH = chart.clientHeight - caption.offsetHeight;
+    if (availW <= 0 || availH <= 0) return;
+
+    var W = Math.min(availW * MAX_WIDTH, (availH - 6) * ASPECT);
+    var H = W / ASPECT;
+    matrix.style.width = W + "px";
+    matrix.style.height = H + "px";
+
+    var cellW = (W - 30) / MONTHS;
+    var cellH = (H - 14) / YEARS;
+    var dot = Math.max(3, Math.floor(Math.min(cellW, cellH) * DOT_RATIO));
+    root.style.setProperty("--dot", dot + "px");
+  }
+
+  // puncta pingere ex kalendario
+  function paint() {
+    if (!birthISO) return;
+    var b = new Date(birthISO + "T00:00:00");
+    var bY = b.getFullYear(), bM = b.getMonth();
+    var now = new Date(), nY = now.getFullYear(), nM = now.getMonth();
+
+    for (var r = 0; r < YEARS; r++) {
+      var year = bY + r;
+      for (var c = 0; c < MONTHS; c++) {
+        var cell = cells[r * MONTHS + c];
+        cell.className = "cell";
+        var afterBirth = year > bY || (year === bY && c >= bM);
+        var notFuture = year < nY || (year === nY && c <= nM);
+        if (afterBirth && notFuture) cell.className = "cell lived";
+        if (afterBirth && year === nY && c === nM) cell.className = "cell lived now";
+      }
+    }
+  }
+
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+  function start(iso) {
+    birthISO = iso;
+    try { localStorage.setItem(KEY, iso); } catch (e) {}
+    intro.className = "intro hidden";
+    resetB.hidden = false;
+    layout();
+    paint();
+  }
+
+  // diem / mensem / annum probare
+  function validate(dd, mm, yy) {
+    if (!dd || !mm || !yy) return { msg: "Comple diem, mensem et annum." };
+    var day = +dd, mon = +mm, year = +yy;
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    if (year < 1900 || year > now.getFullYear())
+      return { msg: "Annus inter 1900 et " + now.getFullYear() + " esse debet." };
+    if (mon < 1 || mon > 12) return { msg: "Mensis inter 1 et 12 esse debet." };
+    if (day < 1 || day > 31) return { msg: "Dies inter 1 et 31 esse debet." };
+
+    var dt = new Date(year, mon - 1, day);
+    if (dt.getFullYear() !== year || dt.getMonth() !== mon - 1 || dt.getDate() !== day)
+      return { msg: "Ea dies non exsistit." };
+    if (dt > today) return { msg: "Dies futura esse non potest." };
+
+    return { iso: year + "-" + pad2(mon) + "-" + pad2(day) };
+  }
+
+  function bind() {
+    var fields = [dayI, monI, yeaI];
+
+    for (var k = 0; k < fields.length; k++) {
+      (function (input, idx) {
+        input.onkeydown = function (e) {
+          if (e.keyCode === 8 && !input.value && idx > 0) fields[idx - 1].focus();
+        };
+        input.oninput = function () {
+          input.value = input.value.replace(/\D/g, "");
+          errorEl.textContent = "";
+          input.className = "box";
+          if (input.value.length >= +input.getAttribute("maxlength") && idx < fields.length - 1)
+            fields[idx + 1].focus();
+        };
+      })(fields[k], k);
+    }
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var res = validate(dayI.value, monI.value, yeaI.value);
+      if (res.iso) {
+        start(res.iso);
+      } else {
+        errorEl.textContent = res.msg;
+        for (var i = 0; i < fields.length; i++) fields[i].className = "box invalid";
+      }
     };
 
-    var cells = [];                /* cells[(annus-1)*12 + (mensis-1)] */
-    var birthISO = null;
+    resetB.onclick = function () {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      birthISO = null;
+      resetB.hidden = true;
+      errorEl.textContent = "";
+      intro.className = "intro";
+      dayI.focus();
+    };
 
-    /* ----- accessus tutus ad localStorage (ne umquam erret) ----- */
-    function storeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-    function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
-    function storeDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+    window.onresize = function () { layout(); paint(); };
 
-    /* ----- tabulam semel aedificare ----- */
-    function build() {
-      var frag = document.createDocumentFragment();
-      var i, j, node;
-
-      // angulus cum titulo "MENSES"
-      node = document.createElement("div");
-      node.className = "corner";
-      node.style.gridArea = "1 / 1";
-      var small = document.createElement("small");
-      small.textContent = "MENSES";
-      node.appendChild(small);
-      frag.appendChild(node);
-
-      // tituli mensium (1..12) in prima linea
-      for (i = 1; i <= MONTHS; i++) {
-        node = document.createElement("div");
-        node.className = "mlabel";
-        node.style.gridArea = "1 / " + (i + 1);
-        node.textContent = i;
-        frag.appendChild(node);
-      }
-
-      // tituli annorum (per decades) in prima columna
-      for (i = 10; i <= YEARS; i += 10) {
-        node = document.createElement("div");
-        node.className = "ylabel";
-        node.style.gridArea = (i + 1) + " / 1";
-        node.textContent = i;
-        frag.appendChild(node);
-      }
-
-      // puncta: ordo = annus, columna = mensis
-      for (i = 1; i <= YEARS; i++) {
-        for (j = 1; j <= MONTHS; j++) {
-          node = document.createElement("div");
-          node.className = "cell";
-          node.style.gridArea = (i + 1) + " / " + (j + 1);
-          node.appendChild(document.createElement("i"));
-          cells.push(node);
-          frag.appendChild(node);
-        }
-      }
-
-      el.matrix.appendChild(frag);
-    }
-
-    /* ----- magnitudinem tabulae (9:16) et puncti computare ----- */
-    function layout() {
-      var availW = el.chart.clientWidth;
-      var availH = el.chart.clientHeight - el.caption.offsetHeight;
-      if (availW <= 0 || availH <= 0) return;
-
-      var gutterPx = 30;           // columna titulorum annorum + spatium
-      var labelRowPx = 14;         // linea titulorum mensium
-      var margin = 6;              // parvum spatium ne quid excedat
-
-      // maxima area proportionis 9:16 quae latitudini et altitudini apta est
-      var maxW = availW * MAX_WIDTH;
-      var maxH = availH - margin;
-      var W = Math.min(maxW, maxH * ASPECT);
-      var H = W / ASPECT;
-
-      el.matrix.style.width = W + "px";
-      el.matrix.style.height = H + "px";
-
-      // punctum ex minore dimensione cellulae oritur ut rotundum maneat
-      var cellW = (W - gutterPx) / MONTHS;
-      var cellH = (H - labelRowPx) / YEARS;
-      var dot = Math.max(3, Math.floor(Math.min(cellW, cellH) * DOT_RATIO));
-      root.style.setProperty("--dot", dot + "px");
-    }
-
-    /* ----- statum cuiusque puncti pingere (ex kalendario) ----- */
-    function paint() {
-      if (!birthISO) return;
-      var birth = new Date(birthISO + "T00:00:00");
-      var bY = birth.getFullYear(), bM = birth.getMonth();   // mensis 0..11
-      var now = new Date();
-      var nY = now.getFullYear(), nM = now.getMonth();
-
-      for (var r = 0; r < YEARS; r++) {
-        var year = bY + r;
-        for (var c = 0; c < MONTHS; c++) {
-          var cell = cells[r * MONTHS + c];
-          cell.className = "cell";
-          var afterBirth = year > bY || (year === bY && c >= bM);
-          var notFuture  = year < nY || (year === nY && c <= nM);
-          if (afterBirth && notFuture) cell.classList.add("lived");
-          if (afterBirth && year === nY && c === nM) cell.classList.add("now");
-        }
-      }
-    }
-
-    /* ----- cum die incipere ----- */
-    function start(iso) {
-      birthISO = iso;
-      storeSet(STORAGE_KEY, iso);
-      el.intro.classList.add("hidden");
-      el.reset.hidden = false;
-      layout();
-      paint();
-    }
-
-    function pad2(n) { return (n < 10 ? "0" : "") + n; }
-
-    /* ----- diem / mensem / annum probare ----- */
-    function validate(dd, mm, yy) {
-      if (!dd || !mm || !yy) {
-        return { ok: false, msg: "Comple diem, mensem et annum." };
-      }
-      var day = +dd, mon = +mm, year = +yy;
-      var now = new Date();
-      var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      if (year < 1900 || year > now.getFullYear()) {
-        return { ok: false, msg: "Annus inter 1900 et " + now.getFullYear() + " esse debet." };
-      }
-      if (mon < 1 || mon > 12) {
-        return { ok: false, msg: "Mensis inter 1 et 12 esse debet." };
-      }
-      if (day < 1 || day > 31) {
-        return { ok: false, msg: "Dies inter 1 et 31 esse debet." };
-      }
-      var dt = new Date(year, mon - 1, day);   // dies vera (reicit 31/02)
-      if (dt.getFullYear() !== year || dt.getMonth() !== mon - 1 || dt.getDate() !== day) {
-        return { ok: false, msg: "Ea dies non exsistit." };
-      }
-      if (dt > today) {
-        return { ok: false, msg: "Dies futura esse non potest." };
-      }
-      return { ok: true, iso: year + "-" + pad2(mon) + "-" + pad2(day) };
-    }
-
-    /* ----- eventus ----- */
-    function bind() {
-      var fields = [el.day, el.month, el.year];
-
-      fields.forEach(function (input, idx) {
-        // solae cifrae + progressus automaticus dum pyxis impletur
-        input.addEventListener("input", function () {
-          input.value = input.value.replace(/\D/g, "");
-          el.error.textContent = "";
-          input.classList.remove("invalid");
-          var max = +input.getAttribute("maxlength");
-          if (input.value.length >= max && idx < fields.length - 1) {
-            fields[idx + 1].focus();
-          }
-        });
-        // regressus ad pyxidem priorem si vacua est
-        input.addEventListener("keydown", function (e) {
-          if (e.key === "Backspace" && !input.value && idx > 0) {
-            fields[idx - 1].focus();
-          }
-        });
-      });
-
-      el.form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var res = validate(el.day.value, el.month.value, el.year.value);
-        if (res.ok) {
-          start(res.iso);
-        } else {
-          el.error.textContent = res.msg;
-          fields.forEach(function (f) { f.classList.add("invalid"); });
-        }
-      });
-
-      el.reset.addEventListener("click", function () {
-        storeDel(STORAGE_KEY);
-        birthISO = null;
-        el.reset.hidden = true;
-        el.error.textContent = "";
-        el.intro.classList.remove("hidden");
-        el.day.focus();
-      });
-
-      window.addEventListener("resize", function () {
-        layout();
-        paint();
-      });
-    }
-
-    /* ----- initium ----- */
-    function init() {
-      build();
-      bind();
-      var saved = storeGet(STORAGE_KEY);
-      if (saved && /^\d{4}-\d{2}-\d{2}$/.test(saved)) {
-        var parts = saved.split("-");
-        el.year.value = parts[0];
-        el.month.value = parts[1];
-        el.day.value = parts[2];
-        start(saved);
-      } else {
-        layout();   // tabulam post schermum initiale paratam relinquit
-      }
-    }
-
-    init();
-  })();
-
-  /* ================================================================== *
-   * Omne zoom prohibere (digitis, duplici tactu, Ctrl+rota vel clavibus).
-   * ================================================================== */
-  (function () {
-    "use strict";
-    var opts = { passive: false };
-
-    // pinch/zoom Safari iOS
-    ["gesturestart", "gesturechange", "gestureend"].forEach(function (evt) {
-      document.addEventListener(evt, function (e) { e.preventDefault(); }, opts);
-    });
-
-    // duo vel plures digiti (pinch) in ceteris navigatoribus
+    // pinch-zoom prohibere (duo digiti)
     document.addEventListener("touchmove", function (e) {
       if (e.touches.length > 1) e.preventDefault();
-    }, opts);
+    }, { passive: false });
+  }
 
-    // duplex tactus celer
-    var lastTouchEnd = 0;
-    document.addEventListener("touchend", function (e) {
-      var now = Date.now();
-      if (now - lastTouchEnd <= 300) e.preventDefault();
-      lastTouchEnd = now;
-    }, opts);
+  function init() {
+    build();
+    bind();
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    if (saved && /^\d{4}-\d{2}-\d{2}$/.test(saved)) {
+      yeaI.value = saved.substring(0, 4);
+      monI.value = saved.substring(5, 7);
+      dayI.value = saved.substring(8, 10);
+      start(saved);
+    } else {
+      layout();
+    }
+  }
 
-    // Ctrl/⌘ + rota (in tabula)
-    document.addEventListener("wheel", function (e) {
-      if (e.ctrlKey || e.metaKey) e.preventDefault();
-    }, opts);
-
-    // Ctrl/⌘ + '+', '-', '0'
-    document.addEventListener("keydown", function (e) {
-      if ((e.ctrlKey || e.metaKey) &&
-          (e.key === "+" || e.key === "-" || e.key === "=" || e.key === "0")) {
-        e.preventDefault();
-      }
-    });
-  })();
-  </script>
+  init();
+})();
+</script>
 </body>
 </html>
