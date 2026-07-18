@@ -17,12 +17,16 @@ todo en pantalla **sin scroll**.
 3. Se rellenan los puntos de los meses vividos y se marca el mes en curso.
 4. El botón discreto **«fecha»** (arriba a la derecha) permite cambiarla.
 
+La interfaz está **íntegramente en latín**.
+
 ## Características
 
-- **HTML, CSS y JavaScript vanilla puro**, sin dependencias ni build.
+- **Un único archivo `index.html`** con HTML, CSS y JavaScript vanilla puro,
+  sin dependencias ni build.
 - Diseño **vertical** para móvil sin necesidad de girar la pantalla.
 - **Sin scroll** ni horizontal ni vertical: la cuadrícula se redimensiona al
   espacio disponible.
+- Casillas separadas de día / mes / año con validación de fecha real.
 - Persistencia local con `localStorage`.
 - Estética sobria de póster: tipografía serif y la cita de Marco Aurelio.
 
@@ -30,9 +34,7 @@ todo en pantalla **sin scroll**.
 
 ```
 memento-mori/
-├── index.html      # estructura de la página
-├── styles.css      # estilos y maquetación de la cuadrícula
-├── app.js          # lógica: cuadrícula, cálculo de meses y persistencia
+├── index.html                    # toda la web (HTML + CSS + JS en un archivo)
 └── .github/workflows/pages.yml   # publicación automática en GitHub Pages
 ```
 
